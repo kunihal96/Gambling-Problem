@@ -1,56 +1,64 @@
-#! /bin/bash
+function calculateWinLossPercent()
+{
+   percentvalue=$(( $StopPercent*$PlayerAmount/100 ))
+   Winbreak=$(( $PlayerAmount + $percentvalue ))
+   Lossbreak=$(( $PlayerAmount - $percentvalue ))
+}
 
-echo Gambling problem solved here
+#! /bin/bash
+echo gambling problem solved here
 
 #Stake value everyday
-DailyStake=100
+DailyStake=10
 
-#Each game bet
+#Each game Bet
 Bet=1
 
-#Take Risk Percetage from user
-echo "Enter win/loss percetage for stop playing"
-read StopPercent
+StopPercent=50
+monthearningss=0
+PlayerAmount=0
 
-percentvalue=$(( $StopPercent*$DailyStake/100 ))
+declare -a earnings
+for i in {0..5} #loop for month(20 days)
+do
+   ((PlayerAmount+=$DailyStake))
+   calculateWinLossPercent
+   dayearning=0
+   while(($PlayerAmount<$Winbreak && $PlayerAmount>$Lossbreak)) #loop for day
+   do
+	Betresult=$((RANDOM%2))
+	if (($Betresult==1))
+	then
+	   ((PlayerAmount+=1)) #won so increase the amount
+	   ((dayearning++))
+	else
+	   ((PlayerAmount-=1)) #lost so decrease the amount
+	   ((dayearning--))
+	fi
+   done
+   earnings[i]=$dayearning
+done
 
-Winbreak=$(( $DailyStake + $percentvalue ))
-Lossbreak=$(( $DailyStake - $percentvalue ))
 
 monthearnings=0
-   declare -a earnings
-   for i in {0..19}  #loop for month(20 days)
-   do
-       todayAmount=$DailyStake
-       dayearning=0
-       while(($todayAmount<$Winbreak && $todayAmount>$Lossbreak)) #loop for day
-       do
-           betresult=$((RANDOM%2))
-           if (($betresult==1))
-           then
-               ((todayAmount+=1))  #won so increase the amount
-               ((dayearning++))
-           else
-               ((todayAmount-=1))  #lost so decrease the amount
-               ((dayearning--))
-           fi
-       done
-       earnings[i]=$dayearning
-       ((monthearnings+=dayearning))
-       if (($dayearning>0))
-       then
-           ((win_dayss++))
-       else
-           ((loose_dayss++))
-       fi
-   done
+win_days=0
+loose_days=0
+for ((i=0;i<20;i++))
+do
+   ((monthearnings+=earnings[i]))
+   if ((earnings[i]>0))
+   then
+	((win_days++))
+	((win_amount+=earnings[i]))
+   else
+	((loose_days++))
+	((lose_amount+=earnings[i]))
+   fi
+done
 
+echo
+echo 'Monthly earnings:' $monthearnings
+echo Days won : $win_days Winning amount: $win_amount
+echo Days Lost : $loose_days Losing amount: $lose_amount
 
-   #for ((i=0;i<20;i++))
-   #do
-       #((monthearnings+=earnings[i]))
-   #done
-
-   echo
-   echo 'Monthly earnings:' $monthearnings
 
