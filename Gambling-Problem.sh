@@ -43,6 +43,11 @@ done
 monthearnings=0
 win_days=0
 loose_days=0
+luckyday=0
+unlunckyday=0
+highestamount=0
+lowestamount=0
+
 for ((i=0;i<20;i++))
 do
    ((monthearnings+=earnings[i]))
@@ -54,11 +59,29 @@ do
 	((loose_days++))
 	((lose_amount+=earnings[i]))
    fi
+   
+   if ((i==0))
+   then
+	((highestamount=$monthearnings))
+	((lowestamount=$monthearnings))
+	((luckyday=i+1))
+	((unlunckyday=i+1))
+   fi
+   if [[ $monthearnings -gt $highestamount ]]
+   then
+	highestamount=$monthearnings
+	((luckyday=i+1))
+   fi
+   if [[ $monthearnings -lt $lowestamount ]]
+   then
+	lowestamount=$monthearnings
+	((unlunckyday=i+1))
+   fi
 done
 
 echo
 echo 'Monthly earnings:' $monthearnings
 echo Days won : $win_days Winning amount: $win_amount
 echo Days Lost : $loose_days Losing amount: $lose_amount
-
-
+echo Luckiest Day $luckyday with earnings: $highestamount
+echo UnLuckiest Day $unlunckyday with earnings: $lowestamount
